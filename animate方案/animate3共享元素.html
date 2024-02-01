@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <style>
+            #container {
+                width: auto;
+                height: auto;
+                border: 1px solid #000;
+                margin: 0 auto;
+                overflow: hidden;
+            }
+            .item {
+                width: 100px;
+                height: 100px;
+                background-color: red;
+                margin: 10px 1px;
+                float: left;
+                text-align: center;
+                line-height: 100px;
+                font-size: 30px;
+                color: #fff;
+            }
+            #modal{
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.3);
+                z-index: 100;
+            }
+            #modal > .item{
+                position: absolute;
+                top: 120px;
+                left: 0%;
+                width: 100%;
+                height: 200px;
+                background-color: red;
+                margin: 10px 1px;
+                float: left;
+                text-align: center;
+                line-height: 100px;
+                font-size: 30px;
+                color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+        </div>
+    </body>
+    <script>
+        const container = document.getElementById("container");
+        const sortBtn = document.getElementById("sort");
+        var modal = null;
+        record(container);
+        // 记录开始位置信息
+        function record(container) {
+            const all = [...container.children];
+            all.forEach((item, i) => {
+                const rect = item.getBoundingClientRect();
+                item.startX = rect.left;
+                item.startY = rect.top;
+                item.width = rect.width;
+                item.height = rect.height;
+            });
+            all.forEach((item, i) => {
+                item.onclick = (event) => {
+                    change(event.target);
+                    play(event.target);
+                };
+            });
+        }
+        function change(element) {
+            current = element.cloneNode(true);
+            modal = document.createElement("div");
+            modal.id = "modal";
+            modal.appendChild(current);
+            document.body.appendChild(modal);
+        }
+        function play(preItem) {
+            modal.animate(
+                [
+                    { backgroundColor: `rgba(0, 0, 0, 0)` },
+                    { backgroundColor: `rgba(0, 0, 0, ${0.3})` },
+                ],
+                { duration: 600 }
+            );
+            const rect = current.getBoundingClientRect();
+            const currentX = rect.left;
+            const currentY = rect.top;
+            const width = rect.width;
+            const height = rect.height;
+            
+            const x = preItem.startX - currentX;
+            const y = preItem.startY - currentY;
+            current.animate(
+                [
+                    {
+                        transform: `translate(${x}px, ${y}px)`,
+                        width: `${preItem.width}px`,
+                        height: `${preItem.height}px`,
+                    },
+                    {
+                        transform: "translate(0px, 0px)",
+                        height: `${height}px`,
+                        width: `${width}px`,
+                    },
+                ],
+                { duration: 600 }
+            );
+            modal.onclick = () => {
+                const ani = modal.animate(
+                    [
+                        { backgroundColor: `rgba(0, 0, 0, ${0.3})` },
+                        { backgroundColor: `rgba(0, 0, 0, 0)` },
+                    ],
+                    { duration: 600 }
+                );
+
+                const rect = current.getBoundingClientRect();
+                const currentX = rect.left;
+                const currentY = rect.top;
+                const width = rect.width;
+                const height = rect.height;
+
+                const x = preItem.startX - currentX;
+                const y = preItem.startY - currentY;
+                current.animate(
+                    [
+                        {
+                            transform: "translate(0px, 0px)",
+                            height: `${height}px`,
+                            width: `${width}px`,
+                        },
+                        {
+                            transform: `translate(${x}px, ${y}px)`,
+                            width: `${preItem.width}px`,
+                            height: `${preItem.height}px`,
+                        },
+                    ],
+                    { duration: 600 }
+                );
+
+                ani.onfinish = () => {
+                    modal.remove();
+                };
+            };
+        }
+    </script>
+</html>

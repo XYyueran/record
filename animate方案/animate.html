@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <style>
+            #container {
+                width: auto;
+                height: auto;
+                border: 1px solid #000;
+                margin: 0 auto;
+                overflow: hidden;
+            }
+            .item {
+                width: 100px;
+                height: 100px;
+                background-color: red;
+                margin: 10px 1px;
+                float: left;
+                text-align: center;
+                line-height: 100px;
+                font-size: 30px;
+                color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+        </div>
+
+        <button id="sort">随机排序</button>
+    </body>
+    <script>
+        const container = document.getElementById("container");
+        const sortBtn = document.getElementById("sort");
+        // 记录开始位置信息
+        function record(container) {
+            const all = [...container.children];
+            all.forEach((item, i) => {
+                const rect = item.getBoundingClientRect();
+                item.startX = rect.left;
+            });
+            console.log('0',all)
+        }
+        function change() {
+            const all = [...container.children];
+            const len = all.length;
+            all.forEach((item, i) => {
+                const newIndex = Math.floor(Math.random() * len);
+                if (newIndex !== i) {
+                    const nextDOM = item.nextElementSibling;
+                    container.insertBefore(item, all[newIndex]);
+                    container.insertBefore(all[newIndex], nextDOM);
+                }
+            });
+            console.log('1',all)
+        }
+        function play(container) {
+            const all = [...container.children];
+            const len = all.length;
+            all.forEach((item, i) => {
+                const rect = item.getBoundingClientRect();
+                const currentX = rect.left;
+                item.animate(
+                    [
+                        {
+                            transform: `translateX(${
+                                item.startX - currentX
+                            }px)`,
+                        },
+                        { transform: "translateX(0px)" },
+                    ],
+                    { duration: 600 }
+                );
+            });
+        }
+        sortBtn.onclick = () => {
+            record(container);
+            change();
+            play(container);
+        };
+    </script>
+</html>
